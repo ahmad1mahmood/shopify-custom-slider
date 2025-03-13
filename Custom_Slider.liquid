@@ -1,0 +1,454 @@
+{% schema %}
+{
+  "name": "Custom Slider",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Slide Title",
+          "default": "Refurbished Laptops"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Slide Description",
+          "default": "Explore a wide variety of expertly refurbished laptop picks - up to 70% off."
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button Link"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_desktop",
+          "label": "Desktop Slide Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Mobile Slide Image"
+        },
+        {
+  "type": "image_picker",
+  "id": "background_image",
+  "label": "Background Image"
+},
+        {
+  "type": "image_picker",
+  "id": "background_image_mobile",
+  "label": "Mobile Background Image"
+},
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background Color",
+          "default": "transparent"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_gradient",
+          "label": "Use Gradient Background",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "gradient_start_color",
+          "label": "Gradient Start Color",
+          "default": "#ff7e5f"
+        },
+        {
+          "type": "color",
+          "id": "gradient_end_color",
+          "label": "Gradient End Color",
+          "default": "#feb47b"
+        },
+        {
+          "type": "color",
+          "id": "heading_color",
+          "label": "Heading Text Color",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "paragraph_color",
+          "label": "Paragraph Text Color",
+          "default": "#333333"
+        },
+        {
+          "type": "color",
+          "id": "button_background_color",
+          "label": "Button Background Color",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "button_text_color",
+          "label": "Button Text Color",
+          "default": "#ffffff"
+        },
+        
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Refurbished Laptops Slider",
+      "category": "Slideshow"
+    }
+  ]
+}
+{% endschema %}
+
+
+<div class="custom-slider-wrapper" id="slider-{{ section.id }}" role="region" aria-label="Custom Slider">
+  <div class="custom-slider-container">
+    <button class="custom-prev-btn" aria-label="Previous Slide">&#10094;</button>
+    <div class="custom-slides-track">
+      {% if section.blocks.size > 0 %}
+        {% for block in section.blocks %}
+          <div class="custom-slide-item"
+            style="
+              {% if block.settings.use_gradient %}
+                background: linear-gradient(90deg, {{ block.settings.gradient_start_color }}, {{ block.settings.gradient_end_color }});
+              {% else %}
+                background-color: {{ block.settings.background_color | default: 'transparent' }};
+              {% endif %}
+            "
+            aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}"
+            {% if forloop.first %}aria-current="true"{% endif %}>
+            
+            <!-- Background Images -->
+            <div class="background-images">
+              <picture>
+                <!-- Mobile Background Image -->
+                <source media="(max-width: 768px)" srcset="{{ block.settings.background_image_mobile | img_url: '800x' }}">
+                <!-- Desktop Background Image -->
+                <source media="(min-width: 769px)" srcset="{{ block.settings.background_image | img_url: '2000x' }}">
+                <!-- Fallback Image -->
+                <img src="{{ block.settings.background_image | img_url: '2000x' }}" alt="" aria-hidden="true" loading="lazy">
+              </picture>
+            </div>
+            <div class="custom-slide-content">
+              {% if block.settings.title != blank %}
+                <h2 class="heading" id="heading-{{ section.id }}" style="color: {{ block.settings.heading_color }};">{{ block.settings.title }}</h2>
+              {% endif %}
+              {% if block.settings.description != blank %}
+                <p class="paragraph" id="text-{{ section.id }}" style="color: {{ block.settings.paragraph_color }};">{{ block.settings.description }}</p>
+              {% endif %}
+              {% if block.settings.button_link != blank and block.settings.button_text != blank %}
+                <a href="{{ block.settings.button_link }}" class="custom-shop-btn" id="btn-{{ section.id }}" style="background-color: {{ block.settings.button_background_color }}; color: {{ block.settings.button_text_color }};">{{ block.settings.button_text }}</a>
+              {% endif %}
+            </div>
+            {% unless block.settings.background_image != blank or block.settings.background_image_mobile != blank %}
+            <div class="custom-slide-image">
+              {% if block.settings.image_desktop != blank or block.settings.image_mobile != blank %}
+                <picture>
+                  <!-- Mobile Image -->
+                  <source media="(max-width: 768px)" srcset="{{ block.settings.image_mobile | img_url: '800x' }}">
+                  <!-- Desktop Image -->
+                  <source media="(min-width: 769px)" srcset="{{ block.settings.image_desktop | img_url: '1200x' }}">
+                  <!-- Fallback Image -->
+                  <img src="{{ block.settings.image_desktop | img_url: '1200x' }}" alt="{{ block.settings.title }}" loading="lazy">
+                </picture>
+              {% else %}
+                <div class="placeholder-image">No image available</div>
+              {% endif %}
+            </div>
+              {% endunless %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No slides added yet. Please add slides in the theme editor.</p>
+      {% endif %}
+    </div>
+    <button class="custom-next-btn" aria-label="Next Slide">&#10095;</button>
+  </div>
+
+  <!-- Pagination Dots -->
+  <div class="custom-pagination-dots">
+    {% for block in section.blocks %}
+      <span class="custom-dot {% if forloop.first %}active{% endif %}" data-slide-id="slide-{{ forloop.index0 }}"></span>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+:root {
+  --slider-bg: linear-gradient(90deg, #a0fdfd, #a0fdaa);
+  --button-bg: black;
+  --button-color: white;
+}
+  
+.background-images {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Ensures the background image stays behind the content */
+}
+
+.background-images img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image covers the entire slide */
+  object-position: center;
+}
+  
+.custom-slider-wrapper {
+  position: relative;
+  background: transparent;
+  padding: 0px;
+  overflow: hidden;
+}
+
+.custom-slider-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.custom-slides-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  width: 100%;
+}
+
+.custom-slide-item {
+  position:relative;
+  min-width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+}
+
+.custom-slide-content {
+  max-width: 40%;
+  margin-left: 45px;
+  z-index: 1; 
+}
+
+.custom-slide-item h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-family: Assistant, sans-serif;
+}
+
+.custom-slide-item p {
+  font-size: 14px;
+  margin-bottom: 15px;
+  line-height: 1.5;
+  font-family: Assistant, sans-serif;
+}
+
+.custom-shop-btn {
+  background: var(--button-bg);
+  color: var(--button-color);
+  padding: 10px 17px;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 700;
+  display: inline-block;
+  font-size: 12px;
+  line-height: 16px;
+  font-family: Assistant, sans-serif;
+}
+
+.custom-slide-image img {
+  max-width: 90%;
+  height: auto;
+  object-fit: contain;
+  margin-left: 45px;
+}
+
+.custom-prev-btn,
+.custom-next-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 10px;
+  color: #333;
+  z-index:10;
+}
+
+.custom-prev-btn {
+  left: 12px;
+}
+
+.custom-next-btn {
+  right: 12px;
+}
+
+/* Pagination Dots */
+.custom-pagination-dots {
+  display: none; /* Hidden on desktop */
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.custom-dot {
+  width: 10px;
+  height: 10px;
+  background: #bbb;
+  border-radius: 50%;
+  margin: 0 5px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.custom-dot.active {
+  background: #333;
+}
+
+@media (max-width: 1024px) {
+  .custom-slide-content {
+    max-width: 45%;
+    margin-left:auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .custom-slider-container {
+    flex-direction: column;
+  }
+
+  .custom-slide-item {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+
+  .custom-slide-content {
+    max-width: 100%;
+    margin-top: 10px;
+    margin-left: auto;
+  }
+
+  .custom-slide-image img {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .custom-prev-btn,
+  .custom-next-btn {
+    display: none; /* Hide arrows on mobile */
+  }
+
+  .custom-pagination-dots {
+    display: flex; /* Show pagination dots on mobile */
+  }
+}
+</style>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+  const slides = document.querySelectorAll('.custom-slide-item');
+  const prevBtn = document.querySelector('.custom-prev-btn');
+  const nextBtn = document.querySelector('.custom-next-btn');
+  const dots = document.querySelectorAll('.custom-dot');
+  const sliderWrapper = document.querySelector('.custom-slider-wrapper');
+  let currentSlide = 0;
+  let autoSlideInterval;
+  
+  function updateSlide(position) {
+    if (slides.length === 0 || dots.length === 0) return;
+
+    const slideWidth = slides[0].clientWidth;
+    document.querySelector('.custom-slides-track').style.transform = `translateX(-${position * slideWidth}px)`;
+
+    slides.forEach((slide, index) => {
+      slide.setAttribute('aria-hidden', index !== position);
+      slide.setAttribute('aria-current', index === position ? 'true' : 'false');
+    });
+
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === position);
+    });
+
+    // Hide Previous Button on First Slide
+    prevBtn.style.display = (position === 0) ? 'none' : 'block';
+  
+   nextBtn.style.display = (position === slides.length - 1) ? 'none' : 'block'; // Show on all slides except the last
+  
+}
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    updateSlide(currentSlide);
+  }
+
+  function prevSlide() {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    updateSlide(currentSlide);
+  }
+
+  nextBtn.addEventListener('click', nextSlide);
+  prevBtn.addEventListener('click', prevSlide);
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      currentSlide = index;
+      updateSlide(currentSlide);
+    });
+  });
+
+  // Auto-slide every 5 seconds
+  function startAutoSlide() {
+    stopAutoSlide(); // Clear existing interval
+    autoSlideInterval = setInterval(nextSlide, 5000);
+  }
+
+  function stopAutoSlide() {
+    clearInterval(autoSlideInterval);
+  }
+
+  // Pause auto-slide on hover
+  sliderWrapper.addEventListener('mouseenter', stopAutoSlide);
+  sliderWrapper.addEventListener('mouseleave', startAutoSlide);
+
+  // Initialize slider
+  updateSlide(currentSlide);
+  startAutoSlide();
+
+  // Touch swipe functionality
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const sliderTrack = document.querySelector('.custom-slides-track');
+
+  sliderTrack.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  });
+
+  sliderTrack.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].clientX;
+    handleSwipe();
+  });
+
+  function handleSwipe() {
+    const swipeThreshold = 50;
+    if (touchStartX - touchEndX > swipeThreshold) {
+      nextSlide();
+    } else if (touchEndX - touchStartX > swipeThreshold) {
+      prevSlide();
+    }
+  }
+});
+</script>
